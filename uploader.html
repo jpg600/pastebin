@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>sean's pastebin uploader</title>
+    <meta name="viewport" content="width=device-width">
+    <style type="text/css" media="screen">
+      body {
+        height: 85vh;
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+        align-content: space-between;
+        height: 70vh;
+        margin: auto;
+        text-align: center;
+      }
+      #encrypted-select {
+        width: 50px;
+        margin: auto;
+      }
+      form {
+        padding: 2em;
+      }
+      textarea {
+        font-size: 1.2em;
+      }
+      textarea, input {
+        margin-bottom: 1em;
+      }
+      @media (min-width: 600px) {
+        textarea {
+          width: 50%;
+        }
+      }
+      @media (prefers-color-scheme: dark) {
+        body {
+          background-color: black;
+          color: white;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Sean's Pastebin</h1>
+    <p>After uploading you will be redirected to yourfile.txt. Make sure to
+    save the link if you're encrypting. You can change .txt to any valid MIME
+    type to display it in the browser.</p>
+    <code>curl -Ls -o /dev/null -w %{url_effective} -F upload=@- https://pastebin.seanbehan.ca</code>
+    <code>curl -Ls -o /dev/null -w %{url_effective} -F upload=@- https://pastebin.seanbehan.ca/encrypt</code>
+    <p>encryption: </p>
+    <h2 class="plaintext">Upload</h2>
+    <form id="form" enctype="multipart/form-data">
+		<div>
+			<label for="paste">Text</label>
+			<br />
+			<textarea name="paste" rows="20" cols="30" id="paste"></textarea>
+		</div>
+		<div>
+			<label for="file">File</label>
+			<br />
+			<input type="file" name="file" id="file" />
+		</div>
+		<div>
+			<label for="encrypted">Encryption</label>
+			<br />
+			<select name="encrypted" id="encrypted-select">
+		      <option value="off">off</option>
+		      <option value="on">on</option>
+		    </select>
+	    </div>
+	    <br />
+      <button>submit</button>
+    </form>
+  </body>
+  <footer>
+    <a href="https://github.com/codebam/pastebin-worker">source code</a>
+  </footer>
+
+
+<script>
+
+	let file = null; // an array would be good, but that'd be more work
+	let encrypt = false;
+	
+	let form = document.getElementById('form');
+	let fileInput = document.getElementById('file');
+	let textInput = document.getElementById('paste');
+	let encrptedSelect = document.getElementById('encrypted-select');
+	
+	form.onsubmit = (e) => {
+	  e.preventDefault();
+	
+	  let formData = new FormData();
+	
+	  if (file) {
+		formData.append('upload', file);
+	  } else {
+		formData.append('paste', textInput.value);
+	  }
+
+	  fetch('https://pastebin.seanbehan.ca/' + (encrypt ? 'encrypt' : ''), {
+	  	method: 'POST',
+	  	body: formData
+	  }).then((response) => {
+	  	location.href = response.url;
+	  });
+	  
+	};
+	
+	form.onpaste = (e) => {
+	  file = e.clipboardData.items[0].getAsFile();
+	};
+	
+	fileInput.onchange = (e) => {
+	  if (e.target.files.length) {
+	    file = e.target.files[0];
+	  }
+	};
+
+	fileInput.onclick = (e) => {
+	  if (e.target.files.length) {
+	    file = e.target.files[0];
+	  }
+	};
+
+	encrptedSelect.onchange = (e) => {
+	  if(encrptedSelect.value == 'on'){
+	  	encrypt = true;
+	  } else {
+	  	encrypt = false;
+	  }
+	};
+</script>
+</html>

@@ -1,0 +1,11 @@
+name = "pastebin"
+main = "build/worker/shim.mjs"
+compatibility_date = "2023-03-22"
+
+kv_namespaces = [
+    { binding = "pastebin", id = "7a8cc1f085764d55ae29071578ebe338", preview_id = "df270984fc0147c3b3e73e1fa6e79328" }
+]
+
+[build]
+command = "cargo install -q worker-build && worker-build --release"
+
